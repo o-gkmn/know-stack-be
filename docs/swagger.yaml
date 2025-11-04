@@ -1,0 +1,26 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact: {}
+  description: API for the Knowstack project
+  title: Knowstack API
+  version: "1.0"
+paths:
+  /api/v1/health:
+    get:
+      consumes:
+      - application/json
+      description: Checks if the service is alive
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check the liveness of the service
+      tags:
+      - API Health
+swagger: "2.0"
