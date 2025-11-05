@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"knowstack/internal/api/router"
 	"knowstack/internal/core/config"
+	"knowstack/internal/core/service"
 	"knowstack/internal/data/db"
 	"knowstack/internal/utils"
 
@@ -12,9 +13,9 @@ import (
 )
 
 type Server struct {
-	Config config.Server
-	Router *router.Router
-	DB     *gorm.DB
+	Config  config.Server
+	Router  *router.Router
+	DB      *gorm.DB
 }
 
 /*
@@ -34,16 +35,19 @@ func NewServer(config config.Server) *Server {
 		utils.LogFatalWithErr("Failed to auto migrate the database", err)
 	}
 
+	// Create a new service instance
+	serviceInstance := service.NewService(db.GetDB())
+
 	// Create a new router instance and setup the routes
-	r := router.NewRouter()
+	r := router.NewRouter(serviceInstance)
 	r.Setup()
 
 	utils.LogInfo("Server initialized")
 
 	return &Server{
-		Config: config,
-		Router: r,
-		DB:     db.GetDB(),
+		Config:  config,
+		Router:  r,
+		DB:      db.GetDB(),
 	}
 }
 

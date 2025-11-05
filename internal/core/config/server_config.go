@@ -9,12 +9,20 @@ type Server struct {
 	Host     string
 	Database Database
 	Logger   Logger
+	JWT      JWT
 }
 
 type Logger struct {
 	Level       string
 	Format      string
 	Environment string
+}
+
+type JWT struct {
+	Secret           string
+	Issuer           string
+	Audience         string
+	ExpiresInMinutes int
 }
 
 /*
@@ -38,6 +46,12 @@ func DefaultServerConfigFromEnv() Server {
 			Level:       utils.GetEnv("LOG_LEVEL", "info"),
 			Format:      utils.GetEnv("LOG_FORMAT", "text"),
 			Environment: utils.GetEnv("LOG_ENVIRONMENT", "development"),
+		},
+		JWT: JWT{
+			Secret:           utils.GetEnv("JWT_SECRET", "dev_secret"),
+			ExpiresInMinutes: utils.GetEnvAsInt("JWT_EXPIRES_IN_MIN", 60),
+			Issuer:           utils.GetEnv("JWT_ISSUER", "knowstack"),
+			Audience:         utils.GetEnv("JWT_AUDIENCE", "knowstack"),
 		},
 	}
 }

@@ -3,6 +3,7 @@ package router
 import (
 	"knowstack/internal/api/handlers"
 	"knowstack/internal/api/middleware"
+	"knowstack/internal/core/service"
 	"knowstack/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -19,9 +20,9 @@ type Router struct {
 /*
 Creates a new router instance
 */
-func NewRouter() *Router {
+func NewRouter(service *service.Service) *Router {
 	return &Router{
-		Handlers: handlers.NewHandlers(),
+		Handlers: handlers.NewHandlers(service),
 		Gin:      gin.New(),
 	}
 }
@@ -40,6 +41,7 @@ func (r *Router) Setup() error {
 
 	// Setup the routes for the API version 1
 	r.setupHealthRoutes(v1)
+	r.setupUserRoutes(v1)
 
 	// Setup the swagger routes
 	r.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -54,4 +56,13 @@ Setup the health routes for the API version 1
 func (r *Router) setupHealthRoutes(rg *gin.RouterGroup) {
 	health := rg.Group("/health")
 	health.GET("", r.Handlers.HealthHandler.CheckLiveness)
+}
+
+/*
+Setup the user routes for the API version 1
+*/
+func (r *Router) setupUserRoutes(rg *gin.RouterGroup) {
+	user := rg.Group("/users")
+	user.POST("/login", r.Handlers.UserHandler.Login)
+	user.POST("/register", r.Handlers.UserHandler.CreateUser)
 }

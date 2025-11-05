@@ -10,7 +10,7 @@ type HTTPError struct {
 
 type HTTPValidationError struct {
 	HTTPError
-	ValidationErrors []ValidationErrors
+	ValidationError ValidationErrors
 }
 
 type ValidationErrors struct {
@@ -27,14 +27,14 @@ func NewHTTPError(code int, errorType, title string) *HTTPError {
 	}
 }
 
-func NewHTTPValidationError(code int, errorType, title string, validationErrors []ValidationErrors) *HTTPValidationError {
+func NewHTTPValidationError(code int, errorType, title string, validationError ValidationErrors) *HTTPValidationError {
 	return &HTTPValidationError{
 		HTTPError: HTTPError{
 			Code:  code,
 			Type:  errorType,
 			Title: title,
 		},
-		ValidationErrors: validationErrors,
+		ValidationError: validationError,
 	}
 }
 
