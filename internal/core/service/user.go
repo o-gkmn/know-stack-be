@@ -26,12 +26,15 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResponse, error) {
+	utils.LogInfo("Creating user: %+v", req)
 
 	if err := s.DB.Where("username = ?", req.Username).First(&models.User{}).Error; err == nil {
+		utils.LogInfo("Username already exists: %+v", req.Username)
 		return nil, ErrUsernameAlreadyExists
 	}
 
 	if err := s.DB.Where("email = ?", req.Email).First(&models.User{}).Error; err == nil {
+		utils.LogInfo("Email already exists: %+v", req.Email)
 		return nil, ErrEmailAlreadyExists
 	}
 
@@ -42,6 +45,7 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResp
 	}
 
 	if err := s.DB.Create(user).Error; err != nil {
+		utils.LogErrorWithErr("Failed to create user", err)
 		return nil, err
 	}
 
@@ -53,12 +57,16 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResp
 }
 
 func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
+	utils.LogInfo("Logging in user: %+v", req)
+	
 	var user models.User
 	if err := s.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		utils.LogErrorWithErr("Failed to find user", err)
 		return nil, ErrUserNotFound
 	}
 
 	if !utils.VerifyPassword(req.Password, user.Password) {
+		utils.LogError("Invalid password")
 		return nil, ErrInvalidPassword
 	}
 
@@ -66,6 +74,7 @@ func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 
 	token, err := utils.GenerateJWT(userID, user.Email, user.Username)
 	if err != nil {
+		utils.LogErrorWithErr("Failed to generate JWT", err)
 		return nil, err
 	}
 
