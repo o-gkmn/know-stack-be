@@ -78,3 +78,32 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, user)
 }
+
+// @Summary Set claims for a user
+// @Description Sets claims for a user
+// @Tags API User
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.SetClaimsResponse
+// @Router /users/claims [post]
+// @Param user body dto.SetClaimsRequest true "User to set claims for"
+// @Response 400 {object} httperrors.HTTPValidationError
+func (h *UserHandler) SetClaims(c *gin.Context) {
+	var req dto.SetClaimsRequest
+	if ok := utils.BindJSONAndValidate(c, &req, validation.SetClaimsValidationMessages()); !ok {
+		return
+	}
+	err := h.UserService.SetClaims(req.UserID, req.ClaimIDs)
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			httperrors.ErrUserNotFound.Write(c)
+		} else if errors.Is(err, service.ErrClaimsNotFound) {
+			httperrors.ErrClaimsNotFound.Write(c)
+		} else {
+			httperrors.ErrInternalServerError.Write(c)
+		}
+		return
+	}
+
+	c.Status(http.StatusOK)
+}

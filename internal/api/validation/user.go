@@ -37,3 +37,14 @@ func LoginValidationMessages() utils.FieldErrorMessages {
 		},
 	}
 }
+
+func SetClaimsValidationMessages() utils.FieldErrorMessages {
+	return utils.FieldErrorMessages{
+		"UserID": {
+			"required": "Kullanıcı ID zorunludur.",
+		},
+		"ClaimIDs": {
+			"required": "Claims zorunludur.",
+		},
+	}
+}

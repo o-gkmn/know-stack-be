@@ -12,6 +12,9 @@ type User struct {
 	Username  string    `gorm:"unique"`
 	Email     string    `gorm:"unique"`
 	Password  string    `gorm:"not null"`
+	RoleID    uint      `gorm:"not null"`
+	Role      Role      `gorm:"foreignKey:RoleID"`
+	Claims    []Claim   `gorm:"many2many:user_claims;"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }

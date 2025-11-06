@@ -20,3 +20,12 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token string `json:"token"`
 }
+
+type SetClaimsRequest struct {
+	UserID   uint   `json:"user_id" binding:"required"`
+	ClaimIDs []uint `json:"claim_ids" binding:"required"`
+}
+
+type SetClaimsResponse struct {
+	Message string `json:"message"`
+}

@@ -24,6 +24,8 @@ type TokenClaims struct {
 	UserID   string `json:"uid"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
+	RoleID   uint   `json:"role_id"`
+	Claims []string `json:"claim_ids"`
 	jwt.RegisteredClaims
 }
 
@@ -31,7 +33,7 @@ type TokenClaims struct {
 // It uses HMAC-SHA256 and reads configuration from environment variables:
 // - JWT_SECRET: signing key (default: "dev_secret")
 // - JWT_EXPIRES_IN_MIN: expiration in minutes (default: 60)
-func GenerateJWT(userID string, email string, username string) (string, error) {
+func GenerateJWT(userID string, email string, username string, roleID uint, claimNames []string) (string, error) {
 	secret := GetEnv("JWT_SECRET", "dev_secret")
 	issuer := GetEnv("JWT_ISSUER", "knowstack")
 	audience := GetEnv("JWT_AUDIENCE", "knowstack")
@@ -44,6 +46,8 @@ func GenerateJWT(userID string, email string, username string) (string, error) {
 		UserID:   userID,
 		Email:    email,
 		Username: username,
+		RoleID:   roleID,
+		Claims: claimNames,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    issuer,
 			Audience:  jwt.ClaimStrings{audience},

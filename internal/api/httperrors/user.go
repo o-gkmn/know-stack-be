@@ -11,4 +11,5 @@ var (
 	ErrEmailAlreadyExists    = NewHTTPError(http.StatusConflict, "email_already_exists", "Email already exists")
 	ErrUserNotFound          = NewHTTPError(http.StatusNotFound, "user_not_found", "User not found")
 	ErrInvalidPassword       = NewHTTPError(http.StatusBadRequest, "invalid_password", "Invalid password")
+	ErrClaimsNotFound       = NewHTTPError(http.StatusNotFound, "claims_not_found", "Claims not found")
 )
