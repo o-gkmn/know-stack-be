@@ -45,6 +45,7 @@ func (r *Router) Setup() error {
 
 	// Setup the swagger routes
 	r.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.Gin.Static("/docs", "./docs")
 
 	utils.LogInfo("Routes initialized")
 	return nil
