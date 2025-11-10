@@ -3,20 +3,20 @@ package httperrors
 import "github.com/gin-gonic/gin"
 
 type HTTPError struct {
-	Code  int
-	Type  string
-	Title string
+	Code  int    `json:"code"`
+	Type  string `json:"type"`
+	Title string `json:"title"`
 }
 
 type HTTPValidationError struct {
-	HTTPError
-	ValidationError ValidationErrors
+	HTTPError       `json:"http_error"`
+	ValidationError ValidationErrors `json:"validation_error"`
 }
 
 type ValidationErrors struct {
-	Error string
-	Key   string
-	In    string
+	Error string `json:"error"`
+	Key   string `json:"key"`
+	In    string `json:"in"`
 }
 
 func NewHTTPError(code int, errorType, title string) *HTTPError {

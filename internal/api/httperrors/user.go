@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	ErrInvalidRequest        = NewHTTPError(http.StatusBadRequest, "invalid_request", "Invalid request")
-	ErrInternalServerError   = NewHTTPError(http.StatusInternalServerError, "internal_server_error", "Internal server error")
-	ErrUsernameAlreadyExists = NewHTTPError(http.StatusConflict, "username_already_exists", "Username already exists")
-	ErrEmailAlreadyExists    = NewHTTPError(http.StatusConflict, "email_already_exists", "Email already exists")
-	ErrUserNotFound          = NewHTTPError(http.StatusNotFound, "user_not_found", "User not found")
-	ErrInvalidPassword       = NewHTTPError(http.StatusBadRequest, "invalid_password", "Invalid password")
-	ErrClaimsNotFound       = NewHTTPError(http.StatusNotFound, "claims_not_found", "Claims not found")
+	ErrInvalidRequest        = NewHTTPError(http.StatusBadRequest, "invalid_request", "Geçersiz istek")
+	ErrInternalServerError   = NewHTTPError(http.StatusInternalServerError, "internal_server_error", "Sunucu hatası")
+	ErrUsernameAlreadyExists = NewHTTPError(http.StatusConflict, "username_already_exists", "Kullanıcı adı zaten kullanılıyor")
+	ErrEmailAlreadyExists    = NewHTTPError(http.StatusConflict, "email_already_exists", "E-posta zaten kullanılıyor")
+	ErrUserNotFound          = NewHTTPError(http.StatusNotFound, "user_not_found", "Kullanıcı bulunamadı")
+	ErrInvalidPassword       = NewHTTPError(http.StatusBadRequest, "invalid_password", "Geçersiz şifre")
+	ErrClaimsNotFound        = NewHTTPError(http.StatusNotFound, "claims_not_found", "Yetkinlikler bulunamadı")
 )

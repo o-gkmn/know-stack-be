@@ -3,7 +3,7 @@ package router
 import (
 	"knowstack/internal/api/handlers"
 	"knowstack/internal/api/middleware"
-	"knowstack/internal/core/service"
+	"knowstack/internal/core/services"
 	"knowstack/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -20,7 +20,7 @@ type Router struct {
 /*
 Creates a new router instance
 */
-func NewRouter(service *service.Service) *Router {
+func NewRouter(service *services.Service) *Router {
 	return &Router{
 		Handlers: handlers.NewHandlers(service),
 		Gin:      gin.New(),
@@ -28,6 +28,10 @@ func NewRouter(service *service.Service) *Router {
 }
 
 func (r *Router) Setup() error {
+
+	// Add CORS middleware
+	r.Gin.Use(middleware.CORSMiddleware())
+	
 	// Add custom logger middleware
 	r.Gin.Use(middleware.LoggerMiddleware())
 

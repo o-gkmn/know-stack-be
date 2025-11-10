@@ -5,7 +5,7 @@ import (
 	"knowstack/internal/api/dto"
 	"knowstack/internal/api/httperrors"
 	"knowstack/internal/api/validation"
-	"knowstack/internal/core/service"
+	"knowstack/internal/core/services"
 	"knowstack/internal/utils"
 	"net/http"
 
@@ -13,10 +13,10 @@ import (
 )
 
 type UserHandler struct {
-	UserService *service.UserService
+	UserService *services.UserService
 }
 
-func NewUserHandler(userService *service.UserService) *UserHandler {
+func NewUserHandler(userService *services.UserService) *UserHandler {
 	return &UserHandler{UserService: userService}
 }
 
@@ -39,9 +39,9 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	user, err := h.UserService.CreateUser(req)
 	if err != nil {
-		if errors.Is(err, service.ErrUsernameAlreadyExists) {
+		if errors.Is(err, services.ErrUsernameAlreadyExists) {
 			httperrors.ErrUsernameAlreadyExists.Write(c)
-		} else if errors.Is(err, service.ErrEmailAlreadyExists) {
+		} else if errors.Is(err, services.ErrEmailAlreadyExists) {
 			httperrors.ErrEmailAlreadyExists.Write(c)
 		} else {
 			httperrors.ErrInternalServerError.Write(c)
@@ -69,9 +69,9 @@ func (h *UserHandler) Login(c *gin.Context) {
 	}
 	user, err := h.UserService.Login(req)
 	if err != nil {
-		if errors.Is(err, service.ErrUserNotFound) {
+		if errors.Is(err, services.ErrUserNotFound) {
 			httperrors.ErrUserNotFound.Write(c)
-		} else if errors.Is(err, service.ErrInvalidPassword) {
+		} else if errors.Is(err, services.ErrInvalidPassword) {
 			httperrors.ErrInvalidPassword.Write(c)
 		} else {
 			httperrors.ErrInternalServerError.Write(c)
@@ -99,9 +99,9 @@ func (h *UserHandler) SetClaims(c *gin.Context) {
 	}
 	err := h.UserService.SetClaims(req.UserID, req.ClaimIDs)
 	if err != nil {
-		if errors.Is(err, service.ErrUserNotFound) {
+		if errors.Is(err, services.ErrUserNotFound) {
 			httperrors.ErrUserNotFound.Write(c)
-		} else if errors.Is(err, service.ErrClaimsNotFound) {
+		} else if errors.Is(err, services.ErrClaimsNotFound) {
 			httperrors.ErrClaimsNotFound.Write(c)
 		} else {
 			httperrors.ErrInternalServerError.Write(c)

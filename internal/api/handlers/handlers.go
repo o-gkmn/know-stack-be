@@ -1,6 +1,6 @@
 package handlers
 
-import "knowstack/internal/core/service"
+import "knowstack/internal/core/services"
 
 type Handlers struct {
 	HealthHandler *HealthHandler
@@ -11,7 +11,7 @@ type Handlers struct {
 Create a new handlers instance
 Returns a pointer to the handlers instance
 */
-func NewHandlers(service *service.Service) *Handlers {
+func NewHandlers(service *services.Service) *Handlers {
 	return &Handlers{
 		HealthHandler: NewHealthHandler(),
 		UserHandler:   NewUserHandler(service.UserService),

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"knowstack/internal/api/router"
 	"knowstack/internal/core/config"
-	"knowstack/internal/core/service"
+	"knowstack/internal/core/services"
 	"knowstack/internal/data/db"
 	"knowstack/internal/utils"
 
@@ -36,7 +36,7 @@ func NewServer(config config.Server) *Server {
 	}
 
 	// Create a new service instance
-	serviceInstance := service.NewService(db.GetDB())
+	serviceInstance := services.NewService(db.GetDB())
 
 	// Create a new router instance and setup the routes
 	r := router.NewRouter(serviceInstance)
