@@ -26,7 +26,7 @@ func NewUserHandler(userService *service.UserService) *UserHandler {
 // @Accept json
 // @Produce json
 // @Success 201 {object} dto.CreateUserResponse
-// @Router /users [post]
+// @Router /users/register [post]
 // @Param user body dto.CreateUserRequest true "User to create"
 // @Response 400 {object} httperrors.HTTPValidationError
 // @Response 409 {object} httperrors.HTTPError
@@ -60,6 +60,8 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Router /users/login [post]
 // @Param user body dto.LoginRequest true "User to login"
 // @Response 400 {object} httperrors.HTTPValidationError
+// @Response 409 {object} httperrors.HTTPError
+// @Response 500 {object} httperrors.HTTPError
 func (h *UserHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	if ok := utils.BindJSONAndValidate(c, &req, validation.LoginValidationMessages()); !ok {
@@ -88,6 +90,8 @@ func (h *UserHandler) Login(c *gin.Context) {
 // @Router /users/claims [post]
 // @Param user body dto.SetClaimsRequest true "User to set claims for"
 // @Response 400 {object} httperrors.HTTPValidationError
+// @Response 409 {object} httperrors.HTTPError
+// @Response 500 {object} httperrors.HTTPError
 func (h *UserHandler) SetClaims(c *gin.Context) {
 	var req dto.SetClaimsRequest
 	if ok := utils.BindJSONAndValidate(c, &req, validation.SetClaimsValidationMessages()); !ok {
