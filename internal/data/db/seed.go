@@ -89,6 +89,7 @@ func SeedData() error {
 				Username: "admin",
 				Email:    "admin@knowstack.com",
 				Password: "admin123", // This will be hashed by BeforeCreate hook
+				Provider: "local",
 				RoleID:   adminRoleForUser.ID,
 			}
 			if err := db.Create(&adminUser).Error; err != nil {

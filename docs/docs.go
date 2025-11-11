@@ -41,6 +41,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/oauth/google/callback": {
+            "get": {
+                "description": "Handles Google OAuth callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OAuth"
+                ],
+                "summary": "Google Callback",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GoogleAuthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/oauth/google/login": {
+            "get": {
+                "description": "Redirects to Google OAuth login page",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "OAuth"
+                ],
+                "summary": "Google Login",
+                "responses": {
+                    "307": {
+                        "description": "Redirect to Google OAuth login page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/users/claims": {
             "post": {
                 "security": [
@@ -251,6 +297,20 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GoogleAuthResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "isNewUser": {
+                    "type": "boolean"
+                },
+                "refresh_token": {
                     "type": "string"
                 }
             }

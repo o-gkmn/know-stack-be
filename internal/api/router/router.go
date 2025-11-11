@@ -46,7 +46,8 @@ func (r *Router) Setup() error {
 	// Setup the routes for the API version 1
 	r.setupHealthRoutes(v1)
 	r.setupUserRoutes(v1)
-
+	r.setupOAuthRoutes(v1)
+	
 	// Setup the swagger routes
 	r.Gin.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Gin.Static("/docs", "./docs")
@@ -72,4 +73,14 @@ func (r *Router) setupUserRoutes(rg *gin.RouterGroup) {
 	user.POST("/register", r.Handlers.UserHandler.CreateUser)
 	user.POST("/refresh", r.Handlers.UserHandler.Refresh)
 	user.POST("/logout", r.Handlers.UserHandler.Logout)
+}
+
+
+/*
+Setup the oauth routes for the API version 1
+*/
+func (r *Router) setupOAuthRoutes(rg *gin.RouterGroup) {
+	oauth := rg.Group("/oauth")
+	oauth.GET("/google/login", r.Handlers.OAuthHandler.GoogleLogin)
+	oauth.GET("/google/callback", r.Handlers.OAuthHandler.GoogleCallback)
 }

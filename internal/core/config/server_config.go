@@ -2,6 +2,8 @@ package config
 
 import (
 	"knowstack/internal/utils"
+
+	"golang.org/x/oauth2"
 )
 
 type Server struct {
@@ -10,6 +12,7 @@ type Server struct {
 	Database Database
 	Logger   Logger
 	JWT      JWT
+	OAuth    *oauth2.Config
 }
 
 type Logger struct {
@@ -59,5 +62,6 @@ func DefaultServerConfigFromEnv() Server {
 			RefreshExpiresInDaysRemember: utils.GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS_REMEMBER", 30),
 			ExpiresInMinutes:             utils.GetEnvAsInt("JWT_EXPIRES_IN_MIN", 60),
 		},
+		OAuth: DefaultOAuthConfigFromEnv(),
 	}
 }

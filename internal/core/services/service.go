@@ -1,15 +1,20 @@
 package services
 
-import "gorm.io/gorm"
+import (
+	"golang.org/x/oauth2"
+	"gorm.io/gorm"
+)
 
 type Service struct {
-	UserService *UserService
+	UserService  *UserService
 	ClaimService *ClaimService
+	OAuthService *OAuthService
 }
 
-func NewService(db *gorm.DB) *Service {
+func NewService(db *gorm.DB, oauthConfig *oauth2.Config) *Service {
 	return &Service{
-		UserService: NewUserService(db),
+		UserService:  NewUserService(db),
 		ClaimService: NewClaimService(db),
+		OAuthService: NewOAuthService(db, oauthConfig),
 	}
 }

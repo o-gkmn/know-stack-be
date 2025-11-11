@@ -36,7 +36,7 @@ func NewServer(config config.Server) *Server {
 	}
 
 	// Create a new service instance
-	serviceInstance := services.NewService(db.GetDB())
+	serviceInstance := services.NewService(db.GetDB(), config.OAuth)
 
 	// Create a new router instance and setup the routes
 	r := router.NewRouter(serviceInstance)

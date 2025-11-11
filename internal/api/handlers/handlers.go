@@ -5,6 +5,7 @@ import "knowstack/internal/core/services"
 type Handlers struct {
 	HealthHandler *HealthHandler
 	UserHandler   *UserHandler
+	OAuthHandler  *OAuthHandler
 }
 
 /*
@@ -15,5 +16,6 @@ func NewHandlers(service *services.Service) *Handlers {
 	return &Handlers{
 		HealthHandler: NewHealthHandler(),
 		UserHandler:   NewUserHandler(service.UserService),
+		OAuthHandler: NewOAuthHandler(service.OAuthService),
 	}
 }

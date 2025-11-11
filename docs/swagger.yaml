@@ -26,6 +26,15 @@ definitions:
       username:
         type: string
     type: object
+  dto.GoogleAuthResponse:
+    properties:
+      access_token:
+        type: string
+      isNewUser:
+        type: boolean
+      refresh_token:
+        type: string
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -113,6 +122,36 @@ paths:
       summary: Check the liveness of the service
       tags:
       - API Health
+  /oauth/google/callback:
+    get:
+      consumes:
+      - application/json
+      description: Handles Google OAuth callback
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GoogleAuthResponse'
+      summary: Google Callback
+      tags:
+      - OAuth
+  /oauth/google/login:
+    get:
+      consumes:
+      - application/json
+      description: Redirects to Google OAuth login page
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Redirect to Google OAuth login page
+          schema:
+            type: string
+      summary: Google Login
+      tags:
+      - OAuth
   /users/claims:
     post:
       consumes:
