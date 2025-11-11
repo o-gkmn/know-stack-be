@@ -12,4 +12,5 @@ var (
 	ErrUserNotFound          = NewHTTPError(http.StatusNotFound, "user_not_found", "Kullanıcı bulunamadı")
 	ErrInvalidPassword       = NewHTTPError(http.StatusBadRequest, "invalid_password", "Geçersiz şifre")
 	ErrClaimsNotFound        = NewHTTPError(http.StatusNotFound, "claims_not_found", "Yetkinlikler bulunamadı")
+	ErrTokenExpired          = NewHTTPError(http.StatusUnauthorized, "token_expired", "Token süresi dolmuş.")
 )

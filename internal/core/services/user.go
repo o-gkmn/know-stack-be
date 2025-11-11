@@ -17,6 +17,11 @@ var (
 	ErrUserNotFound          = errors.New("user not found")
 	ErrDefaultRoleNotFound   = errors.New("default role not found")
 	ErrClaimsNotFound        = errors.New("claims not found")
+	ErrTokenNotFound         = errors.New("token not found")
+	ErrInvalidToken          = errors.New("invalid token")
+	ErrParseError            = errors.New("parsing error")
+	ErrMismatchTokenAndUser  = errors.New("token and user mismatch")
+	ErrRefreshTokenExpired   = errors.New("refresh token expired")
 )
 
 type UserService struct {
@@ -99,15 +104,118 @@ func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		mergedClaimNames = append(mergedClaimNames, name)
 	}
 
-	token, err := utils.GenerateJWT(userID, user.Email, user.Username, user.RoleID, mergedClaimNames)
+	token, err := utils.GenerateAccessToken(userID, user.Email, user.Username, user.RoleID, mergedClaimNames)
 	if err != nil {
 		utils.LogErrorWithErr("Failed to generate JWT", err)
 		return nil, err
 	}
 
+	// Initialize refresh token record with user ID; token will be assigned after ID generation
+	refreshTokenRecord := models.RefreshToken{
+		UserID:    user.ID,
+		IsRevoked: false,
+	}
+	if err := s.DB.Create(&refreshTokenRecord).Error; err != nil {
+		return nil, err
+	}
+
+	tokenID := strconv.FormatUint(uint64(refreshTokenRecord.ID), 10)
+	refreshToken, err := utils.GenerateRefreshToken(userID, tokenID)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshTokenRecord.Token = refreshToken
+	if err := s.DB.Save(&refreshTokenRecord).Error; err != nil {
+		return nil, err
+	}
+
 	return &dto.LoginResponse{
-		Token: token,
+		AccessToken:  token,
+		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (s *UserService) Refresh(req dto.RefreshRequest) (*dto.RefreshResponse, error) {
+	utils.LogInfo("Refreshing token: %+v", req)
+
+	claims, err := utils.ValidateRefreshToken(req.RefreshToken)
+	if err != nil {
+		utils.LogErrorWithErr("Failed to validate refresh token", err)
+		return nil, err
+	}
+
+	// Parse token ID from claims
+	tokenID64, err := strconv.ParseUint(claims.TokenID, 10, 32)
+	if err != nil {
+		utils.LogErrorWithErr("Failed to parse token ID", err)
+		return nil, err
+	}
+	tokenID := uint(tokenID64)
+
+	// Parse user ID from claims
+	userID64, err := strconv.ParseUint(claims.UserID, 10, 32)
+	if err != nil {
+		utils.LogErrorWithErr("Failed to parse user ID", err)
+		return nil, err
+	}
+	userID := uint(userID64)
+
+	var token models.RefreshToken
+	if err := s.DB.
+		Preload("User").
+		Preload("User.Claims").
+		Preload("User.Role.Claims").
+		Where("ID = ?", tokenID).
+		First(&token).Error; err != nil {
+		utils.LogErrorWithErr("Failed to find token", err)
+		return nil, ErrTokenNotFound
+	}
+
+	if userID != token.UserID {
+		utils.LogError("Token and user mismatch")
+		return nil, ErrMismatchTokenAndUser
+	}
+
+	// merged role and user claims
+	claimNameSet := make(map[string]struct{})
+	for _, c := range token.User.Role.Claims {
+		claimNameSet[c.Name] = struct{}{}
+	}
+	for _, c := range token.User.Claims {
+		claimNameSet[c.Name] = struct{}{}
+	}
+	mergedClaimNames := make([]string, 9, len(claimNameSet))
+	for name := range claimNameSet {
+		mergedClaimNames = append(mergedClaimNames, name)
+	}
+
+	accessToken, err := utils.GenerateAccessToken(
+		claims.UserID,
+		token.User.Email,
+		token.User.Username,
+		token.User.RoleID,
+		mergedClaimNames,
+	)
+	if err != nil {
+		utils.LogErrorWithErr("Failed to generate access token", err)
+		return nil, err
+	}
+
+	return &dto.RefreshResponse{
+		AccessToken: accessToken,
+	}, nil
+}
+
+func (s *UserService) Logout(req dto.LogoutRequest) (*dto.LogoutResponse, error) {
+	if err := s.DB.Model(&models.RefreshToken{}).
+		Where("token = ?", req.RefreshToken).
+		Update("is_revoked", true).Error; err != nil {
+		utils.LogErrorWithErr("Failed to logout", err)
+		return &dto.LogoutResponse{IsSuccess: false}, err
+	}
+
+	return &dto.LogoutResponse{IsSuccess: true}, nil
 }
 
 // SetClaims adds new claims and removes existing claims from the user

@@ -38,6 +38,22 @@ func LoginValidationMessages() utils.FieldErrorMessages {
 	}
 }
 
+func RefreshValidationMessages() utils.FieldErrorMessages {
+	return utils.FieldErrorMessages{
+		"RefreshToken": {
+			"required": "Refresh token zorunludur",
+		},
+	}
+}
+
+func LogoutValidationMessages() utils.FieldErrorMessages {
+	return utils.FieldErrorMessages{
+		"RefreshToken": {
+			"required": "Refresh token zorunludur",
+		},
+	}
+}
+
 func SetClaimsValidationMessages() utils.FieldErrorMessages {
 	return utils.FieldErrorMessages{
 		"UserID": {

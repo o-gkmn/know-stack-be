@@ -17,6 +17,10 @@ import (
 // @description API for the Knowstack project
 // @host localhost:8080
 // @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	// Gin is set to release mode to get rid of the debug logs
 	gin.SetMode(gin.ReleaseMode)

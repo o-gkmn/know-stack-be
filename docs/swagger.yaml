@@ -40,7 +40,33 @@ definitions:
     type: object
   dto.LoginResponse:
     properties:
-      token:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  dto.LogoutRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  dto.LogoutResponse:
+    properties:
+      isSuccess:
+        type: boolean
+    type: object
+  dto.RefreshRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  dto.RefreshResponse:
+    properties:
+      refreshToken:
         type: string
     type: object
   dto.SetClaimsRequest:
@@ -58,35 +84,6 @@ definitions:
   dto.SetClaimsResponse:
     properties:
       message:
-        type: string
-    type: object
-  httperrors.HTTPError:
-    properties:
-      code:
-        type: integer
-      title:
-        type: string
-      type:
-        type: string
-    type: object
-  httperrors.HTTPValidationError:
-    properties:
-      code:
-        type: integer
-      title:
-        type: string
-      type:
-        type: string
-      validationError:
-        $ref: '#/definitions/httperrors.ValidationErrors'
-    type: object
-  httperrors.ValidationErrors:
-    properties:
-      error:
-        type: string
-      in:
-        type: string
-      key:
         type: string
     type: object
 host: localhost:8080
@@ -132,18 +129,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.SetClaimsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/httperrors.HTTPValidationError'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
+      security:
+      - BearerAuth: []
       summary: Set claims for a user
       tags:
       - API User
@@ -166,19 +153,51 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.LoginResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/httperrors.HTTPValidationError'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
       summary: Login a user
+      tags:
+      - API User
+  /users/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out a user
+      parameters:
+      - description: User to logout
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LogoutResponse'
+      summary: Logout a user
+      tags:
+      - API User
+  /users/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes a token
+      parameters:
+      - description: User to refresh
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RefreshResponse'
+      summary: Refresh a token
       tags:
       - API User
   /users/register:
@@ -200,19 +219,13 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/dto.CreateUserResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/httperrors.HTTPValidationError'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httperrors.HTTPError'
       summary: Create a new user
       tags:
       - API User
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

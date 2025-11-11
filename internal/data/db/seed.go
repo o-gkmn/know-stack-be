@@ -20,7 +20,6 @@ func SeedData() error {
 				utils.LogError("Failed to create role: " + role.Name)
 				return err
 			}
-			utils.LogInfo("Created role: " + role.Name)
 		}
 	}
 
@@ -31,6 +30,8 @@ func SeedData() error {
 		{Name: "user:write"},
 		{Name: "user:delete"},
 		{Name: "user:update"},
+		{Name: "user:refresh"},
+		{Name: "user:logout"},
 
 		// Claim claims
 		{Name: "claim:read"},
@@ -53,7 +54,6 @@ func SeedData() error {
 				utils.LogError("Failed to create claim: " + claim.Name)
 				return err
 			}
-			utils.LogInfo("Created claim: " + claim.Name)
 		}
 	}
 
@@ -66,7 +66,6 @@ func SeedData() error {
 			utils.LogError("Failed to assign claims to admin role")
 			return err
 		}
-		utils.LogInfo("Assigned all claims to admin role")
 	}
 
 	// Assign basic read claims to user role
@@ -78,7 +77,6 @@ func SeedData() error {
 			utils.LogError("Failed to assign claims to user role")
 			return err
 		}
-		utils.LogInfo("Assigned read claims to user role")
 	}
 
 	// Create default admin user
@@ -97,7 +95,6 @@ func SeedData() error {
 				utils.LogError("Failed to create admin user")
 				return err
 			}
-			utils.LogInfo("Created default admin user (username: admin, password: Admin123!)")
 		}
 	}
 

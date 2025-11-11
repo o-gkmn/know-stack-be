@@ -18,7 +18,24 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refreshToken" binding:"required"`
+}
+
+type RefreshResponse struct {
+	AccessToken string `json:"refreshToken"`
+}
+
+type LogoutRequest struct {
+	RefreshToken string `json:"refreshToken" binding:"required"`
+}
+
+type LogoutResponse struct {
+	IsSuccess bool `json:"isSuccess"`
 }
 
 type SetClaimsRequest struct {

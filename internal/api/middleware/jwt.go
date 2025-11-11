@@ -24,7 +24,7 @@ func JWTMiddleware() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(401, gin.H{"error": "Unauthorized"})
 			return
 		}
-		claims, err := utils.VerifyJWT(token)
+		claims, err := utils.VerifyAccessToken(token)
 		if err != nil {
 			utils.LogErrorWithErr("Failed to verify JWT", err)
 			ctx.AbortWithStatusJSON(401, gin.H{"error": "Unauthorized"})

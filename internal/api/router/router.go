@@ -31,7 +31,7 @@ func (r *Router) Setup() error {
 
 	// Add CORS middleware
 	r.Gin.Use(middleware.CORSMiddleware())
-	
+
 	// Add custom logger middleware
 	r.Gin.Use(middleware.LoggerMiddleware())
 
@@ -70,4 +70,6 @@ func (r *Router) setupUserRoutes(rg *gin.RouterGroup) {
 	user := rg.Group("/users")
 	user.POST("/login", r.Handlers.UserHandler.Login)
 	user.POST("/register", r.Handlers.UserHandler.CreateUser)
+	user.POST("/refresh", r.Handlers.UserHandler.Refresh)
+	user.POST("/logout", r.Handlers.UserHandler.Logout)
 }
