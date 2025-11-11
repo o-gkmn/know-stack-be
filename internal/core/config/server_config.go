@@ -19,12 +19,13 @@ type Logger struct {
 }
 
 type JWT struct {
-	Secret               string
-	Issuer               string
-	Audience             string
-	RefreshSecret        string
-	RefreshExpiresInDays int
-	ExpiresInMinutes     int
+	Secret                       string
+	Issuer                       string
+	Audience                     string
+	RefreshSecret                string
+	RefreshExpiresInDays         int
+	RefreshExpiresInDaysRemember int
+	ExpiresInMinutes             int
 }
 
 /*
@@ -50,12 +51,13 @@ func DefaultServerConfigFromEnv() Server {
 			Environment: utils.GetEnv("LOG_ENVIRONMENT", "development"),
 		},
 		JWT: JWT{
-			Secret:               utils.GetEnv("JWT_SECRET", "dev_secret"),
-			Issuer:               utils.GetEnv("JWT_ISSUER", "knowstack"),
-			Audience:             utils.GetEnv("JWT_AUDIENCE", "knowstack"),
-			RefreshSecret:        utils.GetEnv("JWT_REFRESH_SECRET", "dev_refresh_secret"),
-			RefreshExpiresInDays: utils.GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS", 30),
-			ExpiresInMinutes:     utils.GetEnvAsInt("JWT_EXPIRES_IN_MIN", 60),
+			Secret:                       utils.GetEnv("JWT_SECRET", "dev_secret"),
+			Issuer:                       utils.GetEnv("JWT_ISSUER", "knowstack"),
+			Audience:                     utils.GetEnv("JWT_AUDIENCE", "knowstack"),
+			RefreshSecret:                utils.GetEnv("JWT_REFRESH_SECRET", "dev_refresh_secret"),
+			RefreshExpiresInDays:         utils.GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS", 7),
+			RefreshExpiresInDaysRemember: utils.GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS_REMEMBER", 30),
+			ExpiresInMinutes:             utils.GetEnvAsInt("JWT_EXPIRES_IN_MIN", 60),
 		},
 	}
 }

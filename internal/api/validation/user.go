@@ -35,6 +35,10 @@ func LoginValidationMessages() utils.FieldErrorMessages {
 			"min":      "Parola en az 8 karakter olmalıdır.",
 			"max":      "Parola en fazla 72 karakter olabilir.",
 		},
+		"Remember": {
+			"required": "Remember me zorunludur",
+			"boolean":  "Remember me bir boolean olmalıdır",
+		},
 	}
 }
 

@@ -34,9 +34,12 @@ definitions:
         maxLength: 72
         minLength: 8
         type: string
+      remember:
+        type: boolean
     required:
     - email
     - password
+    - remember
     type: object
   dto.LoginResponse:
     properties:

@@ -120,13 +120,17 @@ func VerifyAccessToken(tokenString string) (*TokenClaims, error) {
 }
 
 // Generates a refresh token with longer expire times
-func GenerateRefreshToken(userID, tokenID string) (string, error) {
+func GenerateRefreshToken(userID, tokenID string, remember bool) (string, error) {
 	secret := GetEnv("JWT_REFRESH_SECRET", "dev_refresh_secret")
 	audiance := GetEnv("JWT_AUDIENCE", "knowstack")
 	issuer := GetEnv("JWT_ISSUER", "knowstack")
 
 	now := time.Now()
-	refreshExpiresInDays := GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS", 30)
+	refreshExpiresInDays := GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS", 7)
+	if remember {
+		refreshExpiresInDays = GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS_REMEMBER", 30)
+	}
+
 	expireAt := now.Add(time.Duration(refreshExpiresInDays) * time.Hour * 24)
 
 	claims := RefreshTokenClaim{

@@ -259,7 +259,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password"
+                "password",
+                "remember"
             ],
             "properties": {
                 "email": {
@@ -269,6 +270,9 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 72,
                     "minLength": 8
+                },
+                "remember": {
+                    "type": "boolean"
                 }
             }
         },

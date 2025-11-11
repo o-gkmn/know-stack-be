@@ -116,17 +116,20 @@ func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		IsRevoked: false,
 	}
 	if err := s.DB.Create(&refreshTokenRecord).Error; err != nil {
+		utils.LogErrorWithErr("Failed to create token record", err)
 		return nil, err
 	}
 
 	tokenID := strconv.FormatUint(uint64(refreshTokenRecord.ID), 10)
-	refreshToken, err := utils.GenerateRefreshToken(userID, tokenID)
+	refreshToken, err := utils.GenerateRefreshToken(userID, tokenID, req.Remember)
 	if err != nil {
+		utils.LogErrorWithErr("Failed to generate refresh token", err)
 		return nil, err
 	}
 
 	refreshTokenRecord.Token = refreshToken
 	if err := s.DB.Save(&refreshTokenRecord).Error; err != nil {
+		utils.LogErrorWithErr("Failed to save token record", err)
 		return nil, err
 	}
 
