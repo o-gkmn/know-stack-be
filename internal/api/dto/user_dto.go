@@ -15,7 +15,7 @@ type CreateUserResponse struct {
 type LoginRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=8,max=72"`
-	Remember bool   `json:"remember" binding:"required,boolean"`
+	Remember bool   `json:"remember" binding:"boolean"`
 }
 
 type LoginResponse struct {
