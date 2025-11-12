@@ -9,8 +9,8 @@ type HTTPError struct {
 }
 
 type HTTPValidationError struct {
-	HTTPError       `json:"http_error"`
-	ValidationError ValidationErrors `json:"validation_error"`
+	HTTPError       `json:"httpError"`
+	ValidationError ValidationErrors `json:"validationError"`
 }
 
 type ValidationErrors struct {

@@ -3,7 +3,9 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"knowstack/internal/core/services"
+	"knowstack/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -46,24 +48,36 @@ func (h *OAuthHandler) GoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	state := c.Query("state")
 
+	frontendURL := utils.GetEnv("FRONTEND_URL", "http://localhost:3000")
+
 	savedState, err := c.Cookie("oauth_state")
 	if err != nil || savedState != state {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		errorURL := fmt.Sprintf("%s/auth/error?message=%s", frontendURL, "Invalid state")
+		c.Redirect(http.StatusTemporaryRedirect, errorURL)
 		return
 	}
 
 	c.SetCookie("oauth_state", "", -1, "/", "", false, true)
 
 	if code == "" {
-		c.AbortWithStatus(http.StatusBadRequest)
+		errorURL := fmt.Sprintf("%s/auth/error?message=%s", frontendURL, "Invalid code")
+		c.Redirect(http.StatusTemporaryRedirect, errorURL)
 		return
 	}
 
 	response, err := h.OAuthService.HandleGoogleCallback(code)
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		errorURL := fmt.Sprintf("%s/auth/error?message=%s", frontendURL, "Failed to handle Google callback")
+		c.Redirect(http.StatusTemporaryRedirect, errorURL)
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	redirectURL := fmt.Sprintf("%s/oauth/google/callback#access_token=%s&refresh_token=%s&isNewUser=%t",
+		frontendURL,
+		response.AccessToken,
+		response.RefreshToken,
+		response.IsNewUser,
+	)
+
+	c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }

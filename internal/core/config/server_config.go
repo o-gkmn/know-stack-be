@@ -4,6 +4,7 @@ import (
 	"knowstack/internal/utils"
 
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 type Server struct {
@@ -62,6 +63,15 @@ func DefaultServerConfigFromEnv() Server {
 			RefreshExpiresInDaysRemember: utils.GetEnvAsInt("JWT_REFRESH_EXPIRES_IN_DAYS_REMEMBER", 30),
 			ExpiresInMinutes:             utils.GetEnvAsInt("JWT_EXPIRES_IN_MIN", 60),
 		},
-		OAuth: DefaultOAuthConfigFromEnv(),
+		OAuth: &oauth2.Config{
+			ClientID:     utils.GetEnv("GOOGLE_CLIENT_ID", ""),
+			ClientSecret: utils.GetEnv("GOOGLE_CLIENT_SECRET", ""),
+			RedirectURL:  utils.GetEnv("GOOGLE_REDIRECT_URL", ""),
+			Scopes: []string{
+				"https://www.googleapis.com/auth/userinfo.email",
+				"https://www.googleapis.com/auth/userinfo.profile",
+			},
+			Endpoint: google.Endpoint,
+		},
 	}
 }

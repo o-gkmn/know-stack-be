@@ -16,6 +16,8 @@ func NewHealthHandler() *HealthHandler {
 // @Produce json
 // @Success 200 {object} map[string]string
 // @Router /health [get]
+// @Failure 500 {object} httperrors.HTTPError
+// @Failure 400 {object} httperrors.HTTPValidationError
 func (h *HealthHandler) CheckLiveness(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"status": "UP", "service": "liveness"})
 }

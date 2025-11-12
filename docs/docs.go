@@ -37,6 +37,18 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httperrors.HTTPValidationError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httperrors.HTTPError"
+                        }
                     }
                 }
             }
@@ -407,6 +419,45 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "httperrors.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "httperrors.HTTPValidationError": {
+            "type": "object",
+            "properties": {
+                "httpError": {
+                    "$ref": "#/definitions/httperrors.HTTPError"
+                },
+                "validationError": {
+                    "$ref": "#/definitions/httperrors.ValidationErrors"
+                }
+            }
+        },
+        "httperrors.ValidationErrors": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "in": {
+                    "type": "string"
+                },
+                "key": {
                     "type": "string"
                 }
             }

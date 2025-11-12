@@ -98,6 +98,31 @@ definitions:
       message:
         type: string
     type: object
+  httperrors.HTTPError:
+    properties:
+      code:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  httperrors.HTTPValidationError:
+    properties:
+      httpError:
+        $ref: '#/definitions/httperrors.HTTPError'
+      validationError:
+        $ref: '#/definitions/httperrors.ValidationErrors'
+    type: object
+  httperrors.ValidationErrors:
+    properties:
+      error:
+        type: string
+      in:
+        type: string
+      key:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -119,6 +144,14 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httperrors.HTTPValidationError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httperrors.HTTPError'
       summary: Check the liveness of the service
       tags:
       - API Health
