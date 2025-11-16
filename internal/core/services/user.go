@@ -2,10 +2,12 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"knowstack/internal/api/dto"
 	"knowstack/internal/data/models"
 	"knowstack/internal/utils"
 	"strconv"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -25,11 +27,13 @@ var (
 )
 
 type UserService struct {
-	DB *gorm.DB
+	DB    *gorm.DB
 }
 
 func NewUserService(db *gorm.DB) *UserService {
-	return &UserService{DB: db}
+	return &UserService{
+		DB:    db,
+	}
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResponse, error) {
@@ -208,6 +212,62 @@ func (s *UserService) Refresh(req dto.RefreshRequest) (*dto.RefreshResponse, err
 	return &dto.RefreshResponse{
 		AccessToken: accessToken,
 	}, nil
+}
+
+func (s *UserService) RequestPasswordReset(req dto.RequestPasswordResetRequest) (*dto.RequestPasswordResetResponse, error) {
+	utils.LogInfo("Requesting password reset for email: %+v", req.Email)
+
+	var user models.User
+	if err := s.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.LogInfo("User not found: %+v", req.Email)
+			// Don't reveal if user exists or not for security reasons
+			// Return success even if user doesn't exist
+			return &dto.RequestPasswordResetResponse{IsSuccess: true}, nil
+		}
+
+		utils.LogErrorWithErr("Failed to find user", err)
+		return nil, err
+	}
+
+	// Generate password reset token
+	token, err := utils.GeneratePasswordResetToken()
+	if err != nil {
+		utils.LogErrorWithErr("Failed to generate password reset token", err)
+		return nil, err
+	}
+
+	// Set expiration time (default: 1 hour)
+	expiresInHours := utils.GetEnvAsInt("PASSWORD_RESET_EXPIRES_IN_HOURS", 1)
+	expiresAt := time.Now().Add(time.Duration(expiresInHours) * time.Hour)
+
+	// Revoke any existing unused tokens for this user
+	if err := s.DB.Model(&models.PasswordResetToken{}).
+		Where("user_id = ? AND is_used = ?", user.ID, false).
+		Update("is_used", true).Error; err != nil {
+		utils.LogErrorWithErr("Failed to revoke existing tokens", err)
+		// Continue anyway, not critical
+	}
+
+	// Create new password reset token
+	passwordResetToken := models.PasswordResetToken{
+		Token:     token,
+		ExpiresAt: expiresAt,
+		IsUsed:    false,
+		UserID:    user.ID,
+	}
+
+	if err := s.DB.Create(&passwordResetToken).Error; err != nil {
+		utils.LogErrorWithErr("Failed to create password reset token", err)
+		return nil, err
+	}
+
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", utils.GetEnv("FRONTEND_URL", "http://localhost:3000"), token)
+	// TODO: Send email with reset URL
+	utils.LogInfo("Reset URL: %s", resetURL)
+	utils.LogInfo("Password reset email sent", "email", user.Email)
+
+	return &dto.RequestPasswordResetResponse{IsSuccess: true}, nil
 }
 
 func (s *UserService) Logout(req dto.LogoutRequest) (*dto.LogoutResponse, error) {

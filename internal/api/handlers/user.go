@@ -119,6 +119,26 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// @Summary Request password reset for a user
+// @Description Requests password reset for a user
+// @Tags API User
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.RequestPasswordResetResponse
+// @Router /users/request-password-reset [post]
+// @Param user body dto.RequestPasswordResetRequest true "User to request password reset for"
+func (h *UserHandler) RequestPasswordReset(c *gin.Context) {
+	var req dto.RequestPasswordResetRequest
+	if ok := utils.BindJSONAndValidate(c, &req, validation.RequestPasswordResetValidationMessages()); !ok {
+		return
+	}
+	res, err := h.UserService.RequestPasswordReset(req)
+	if err != nil {
+		httperrors.ErrInternalServerError.Write(c)
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // @Summary Set claims for a user
 // @Description Sets claims for a user
 // @Tags API User

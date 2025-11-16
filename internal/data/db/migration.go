@@ -7,7 +7,7 @@ import (
 )
 
 func AutoMigrate() error {
-	err := db.AutoMigrate(&models.Role{}, &models.Claim{}, &models.User{}, &models.RefreshToken{})
+	err := db.AutoMigrate(&models.Role{}, &models.Claim{}, &models.User{}, &models.RefreshToken{}, &models.PasswordResetToken{})
 
 	if err != nil {
 		return errors.New("failed to auto migrate the database")

@@ -58,6 +58,14 @@ func LogoutValidationMessages() utils.FieldErrorMessages {
 	}
 }
 
+func RequestPasswordResetValidationMessages() utils.FieldErrorMessages {
+	return utils.FieldErrorMessages{
+		"Email": {
+			"required": "E-posta zorunludur.",
+		},
+	}
+}
+
 func SetClaimsValidationMessages() utils.FieldErrorMessages {
 	return utils.FieldErrorMessages{
 		"UserID": {

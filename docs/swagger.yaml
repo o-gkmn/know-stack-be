@@ -48,7 +48,6 @@ definitions:
     required:
     - email
     - password
-    - remember
     type: object
   dto.LoginResponse:
     properties:
@@ -80,6 +79,18 @@ definitions:
     properties:
       refreshToken:
         type: string
+    type: object
+  dto.RequestPasswordResetRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  dto.RequestPasswordResetResponse:
+    properties:
+      isSuccess:
+        type: boolean
     type: object
   dto.SetClaimsRequest:
     properties:
@@ -295,6 +306,28 @@ paths:
           schema:
             $ref: '#/definitions/dto.CreateUserResponse'
       summary: Create a new user
+      tags:
+      - API User
+  /users/request-password-reset:
+    post:
+      consumes:
+      - application/json
+      description: Requests password reset for a user
+      parameters:
+      - description: User to request password reset for
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RequestPasswordResetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RequestPasswordResetResponse'
+      summary: Request password reset for a user
       tags:
       - API User
 securityDefinitions:

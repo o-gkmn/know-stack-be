@@ -31,6 +31,14 @@ type RefreshResponse struct {
 	AccessToken string `json:"refreshToken"`
 }
 
+type RequestPasswordResetRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type RequestPasswordResetResponse struct {
+	IsSuccess bool `json:"isSuccess"`
+}
+
 type LogoutRequest struct {
 	RefreshToken string `json:"refreshToken" binding:"required"`
 }

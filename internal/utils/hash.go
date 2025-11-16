@@ -134,3 +134,14 @@ func fnvBlock(seed []byte, counter uint64) []byte {
 	_, _ = h.Write(buf[:])
 	return h.Sum(nil)
 }
+
+// GeneratePasswordResetToken generates a secure random token for password reset.
+// Returns a URL-safe base64 encoded token (32 bytes = 44 characters when encoded).
+func GeneratePasswordResetToken() (string, error) {
+	bytes, err := generateRandomBytes(32)
+	if err != nil {
+		return "", err
+	}
+	// Use RawURLEncoding for URL-safe tokens (no padding, URL-safe characters)
+	return base64.RawURLEncoding.EncodeToString(bytes), nil
+}

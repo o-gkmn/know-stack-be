@@ -273,6 +273,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/request-password-reset": {
+            "post": {
+                "description": "Requests password reset for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API User"
+                ],
+                "summary": "Request password reset for a user",
+                "parameters": [
+                    {
+                        "description": "User to request password reset for",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RequestPasswordResetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RequestPasswordResetResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -331,8 +365,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password",
-                "remember"
+                "password"
             ],
             "properties": {
                 "email": {
@@ -394,6 +427,25 @@ const docTemplate = `{
             "properties": {
                 "refreshToken": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.RequestPasswordResetRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RequestPasswordResetResponse": {
+            "type": "object",
+            "properties": {
+                "isSuccess": {
+                    "type": "boolean"
                 }
             }
         },
