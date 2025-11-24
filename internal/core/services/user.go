@@ -27,25 +27,25 @@ var (
 )
 
 type UserService struct {
-	DB    *gorm.DB
+	DB *gorm.DB
 }
 
 func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{
-		DB:    db,
+		DB: db,
 	}
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResponse, error) {
-	utils.LogInfo("Creating user: %+v", req)
+	utils.LogInfo("Creating user", "username", req.Username, "email", req.Email)
 
 	if err := s.DB.Where("username = ?", req.Username).First(&models.User{}).Error; err == nil {
-		utils.LogInfo("Username already exists: %+v", req.Username)
+		utils.LogInfo("Username already exists", "username", req.Username)
 		return nil, ErrUsernameAlreadyExists
 	}
 
 	if err := s.DB.Where("email = ?", req.Email).First(&models.User{}).Error; err == nil {
-		utils.LogInfo("Email already exists: %+v", req.Email)
+		utils.LogInfo("Email already exists", "email", req.Email)
 		return nil, ErrEmailAlreadyExists
 	}
 
@@ -75,7 +75,7 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.CreateUserResp
 }
 
 func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
-	utils.LogInfo("Logging in user: %+v", req)
+	utils.LogInfo("Logging in user", "email", req.Email)
 
 	var user models.User
 	if err := s.DB.
@@ -144,7 +144,7 @@ func (s *UserService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 }
 
 func (s *UserService) Refresh(req dto.RefreshRequest) (*dto.RefreshResponse, error) {
-	utils.LogInfo("Refreshing token: %+v", req)
+	utils.LogInfo("Refreshing token")
 
 	claims, err := utils.ValidateRefreshToken(req.RefreshToken)
 	if err != nil {
@@ -215,12 +215,12 @@ func (s *UserService) Refresh(req dto.RefreshRequest) (*dto.RefreshResponse, err
 }
 
 func (s *UserService) RequestPasswordReset(req dto.RequestPasswordResetRequest) (*dto.RequestPasswordResetResponse, error) {
-	utils.LogInfo("Requesting password reset for email: %+v", req.Email)
+	utils.LogInfo("Requesting password reset", "email", req.Email)
 
 	var user models.User
 	if err := s.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			utils.LogInfo("User not found: %+v", req.Email)
+			utils.LogInfo("User not found", "email", req.Email)
 			// Don't reveal if user exists or not for security reasons
 			// Return success even if user doesn't exist
 			return &dto.RequestPasswordResetResponse{IsSuccess: true}, nil
@@ -262,10 +262,15 @@ func (s *UserService) RequestPasswordReset(req dto.RequestPasswordResetRequest) 
 		return nil, err
 	}
 
-	resetURL := fmt.Sprintf("%s/reset-password?token=%s", utils.GetEnv("FRONTEND_URL", "http://localhost:3000"), token)
-	// TODO: Send email with reset URL
-	utils.LogInfo("Reset URL: %s", resetURL)
-	utils.LogInfo("Password reset email sent", "email", user.Email)
+	frontendURL := utils.GetEnv("FRONTEND_URL", "http://localhost:3000")
+	resetURL := fmt.Sprintf("%s/reset-password?token=%s", frontendURL, token)
+	body := fmt.Sprintf("Click the link to reset your password: %s", resetURL)
+	err = utils.SendEmail(req.Email, body)
+
+	if err != nil {
+		utils.LogErrorWithErr("Failed to send email", err)
+		return &dto.RequestPasswordResetResponse{IsSuccess: true}, nil
+	}
 
 	return &dto.RequestPasswordResetResponse{IsSuccess: true}, nil
 }
@@ -283,7 +288,7 @@ func (s *UserService) Logout(req dto.LogoutRequest) (*dto.LogoutResponse, error)
 
 // SetClaims adds new claims and removes existing claims from the user
 func (s *UserService) SetClaims(userID uint, claimIDs []uint) error {
-	utils.LogInfo("Setting claims for user: %+v", userID)
+	utils.LogInfo("Setting claims for user", "userID", userID)
 
 	var user models.User
 	if err := s.DB.Where("id = ?", userID).First(&user).Error; err != nil {
